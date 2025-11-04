@@ -4,7 +4,7 @@ Ordering class for PT-Scotch ordering operations.
 
 import numpy as np
 from pathlib import Path
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional
 
 
 class Ordering:
@@ -117,7 +117,3 @@ class Ordering:
     def __repr__(self) -> str:
         """String representation of the ordering."""
         return f"Ordering(size={self.size})"
-
-
-# Add Optional import
-from typing import Optional
