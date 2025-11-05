@@ -65,7 +65,7 @@ if _lib_path:
                     pass
                 break
 
-        _libscotch = ctypes.CDLL(_lib_path)
+        _libscotch = ctypes.CDLL(_lib_path, mode=ctypes.RTLD_GLOBAL)
     except OSError as e:
         _libscotch = None
         print(f"Warning: Could not load Scotch library from {_lib_path}: {e}", file=sys.stderr)
@@ -75,33 +75,36 @@ else:
 
 
 # Opaque structure types (as used in Scotch)
+# These structures need to be large enough to hold the actual C structures
+# We use byte arrays to reserve the space without knowing the exact layout
+
 class SCOTCH_Graph(Structure):
     """Opaque graph structure."""
-    pass
+    _fields_ = [("_opaque", ctypes.c_byte * 256)]  # Reserve 256 bytes
 
 class SCOTCH_Mesh(Structure):
     """Opaque mesh structure."""
-    pass
+    _fields_ = [("_opaque", ctypes.c_byte * 256)]  # Reserve 256 bytes
 
 class SCOTCH_Strat(Structure):
     """Opaque strategy structure."""
-    pass
+    _fields_ = [("_opaque", ctypes.c_byte * 256)]  # Reserve 256 bytes
 
 class SCOTCH_Arch(Structure):
     """Opaque architecture structure."""
-    pass
+    _fields_ = [("_opaque", ctypes.c_byte * 256)]  # Reserve 256 bytes
 
 class SCOTCH_Mapping(Structure):
     """Opaque mapping structure."""
-    pass
+    _fields_ = [("_opaque", ctypes.c_byte * 256)]  # Reserve 256 bytes
 
 class SCOTCH_Ordering(Structure):
     """Opaque ordering structure."""
-    pass
+    _fields_ = [("_opaque", ctypes.c_byte * 256)]  # Reserve 256 bytes
 
 class SCOTCH_Geom(Structure):
     """Opaque geometry structure."""
-    pass
+    _fields_ = [("_opaque", ctypes.c_byte * 256)]  # Reserve 256 bytes
 
 
 # Function signatures
