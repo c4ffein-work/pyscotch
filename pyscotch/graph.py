@@ -39,6 +39,11 @@ class Graph:
             raise RuntimeError(f"Failed to initialize graph (error code: {ret})")
 
         self._initialized = True
+        # Keep references to arrays to prevent garbage collection
+        self._verttab = None
+        self._edgetab = None
+        self._velotab = None
+        self._edlotab = None
 
     def __del__(self):
         """Clean up graph resources."""
@@ -138,12 +143,18 @@ class Graph:
         vertnbr = len(verttab) - 1
         edgenbr = len(edgetab)
 
-        # Convert to ctypes arrays
-        verttab_c = verttab.astype(np.int64).ctypes.data_as(POINTER(lib.SCOTCH_Num))
-        edgetab_c = edgetab.astype(np.int64).ctypes.data_as(POINTER(lib.SCOTCH_Num))
+        # Store arrays to prevent garbage collection
+        self._verttab = verttab.astype(np.int64)
+        self._edgetab = edgetab.astype(np.int64)
+        self._velotab = velotab.astype(np.int64) if velotab is not None else None
+        self._edlotab = edlotab.astype(np.int64) if edlotab is not None else None
 
-        velotab_c = velotab.astype(np.int64).ctypes.data_as(POINTER(lib.SCOTCH_Num)) if velotab is not None else None
-        edlotab_c = edlotab.astype(np.int64).ctypes.data_as(POINTER(lib.SCOTCH_Num)) if edlotab is not None else None
+        # Convert to ctypes arrays
+        verttab_c = self._verttab.ctypes.data_as(POINTER(lib.SCOTCH_Num))
+        edgetab_c = self._edgetab.ctypes.data_as(POINTER(lib.SCOTCH_Num))
+
+        velotab_c = self._velotab.ctypes.data_as(POINTER(lib.SCOTCH_Num)) if self._velotab is not None else None
+        edlotab_c = self._edlotab.ctypes.data_as(POINTER(lib.SCOTCH_Num)) if self._edlotab is not None else None
 
         ret = lib.SCOTCH_graphBuild(
             byref(self._graph),
@@ -217,6 +228,7 @@ class Graph:
         # Use provided strategy or create default
         if strategy is None:
             strategy = Strategy()
+            strategy.set_mapping_default()
 
         ret = lib.SCOTCH_graphMap(
             byref(self._graph),
