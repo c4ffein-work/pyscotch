@@ -1,3 +1,0 @@
-[submodule "external/scotch"]
-	path = external/scotch
-	url = https://gitlab.inria.fr/scotch/scotch.git
